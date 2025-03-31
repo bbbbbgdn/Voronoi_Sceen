@@ -241,11 +241,11 @@ function draw() {
     linkElement.style.transform = 'translate(-50%, -50%)'; // Center the link
     
     // Update styles for hovered state
-    if (hoveredCell === i) {
-      linkElement.style.color = 'yellow'; // or any hover state styling you prefer
-    } else {
-      linkElement.style.color = 'black';
-    }
+    // if (hoveredCell === i) {
+    //   linkElement.style.color = 'yellow'; // or any hover state styling you prefer
+    // } else {
+    //   linkElement.style.color = 'black';
+    // }
   }
 
   // Draw original points
@@ -356,6 +356,7 @@ function mousePressed() {
     
     // Navigate using Cargo's internal page switching
     if (href) {
+      return;
       // Create a temporary link with rel="history"
       const tempLink = document.createElement('a');
       tempLink.href = href;
