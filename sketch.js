@@ -4,7 +4,7 @@ const cellHrefs = {
   "about": "#about",
   "work": "#work",
   "play": "#play",
-  "contact": "/contact-form",
+  "contact": "contact-form",
   "tools": "#tools",
   "photos": "#photos"
 };
