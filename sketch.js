@@ -3,11 +3,15 @@
 const cellHrefs = {
   "about": "about",
   "work": "work",
-  "play": "play",
+  // "play": "play",
   "contact": "contact-form",
-  "tools": "/tools",
-  "photos": "photos"
+  // "tools": "/tools",
+  // "photos": "photos"
 };
+
+// Get labels from hrefs object and filter out commented entries
+const cellLabels = Object.keys(cellHrefs);
+const numPoints = cellLabels.length;
 
 class Voronoi {
   constructor(points) {
@@ -57,8 +61,6 @@ let lastColors = []; // Store last background colors before hover
 let cellCenters = [];
 let hoveredCell = null;
 let cellPixels = []; // Store which pixels belong to which cell
-const numPoints = 6; // Updated to 6 for all labels
-const cellLabels = ["about", "work", "play", "contact", "tools", "photos"];
 const resolution = 20; // Resolution for rendering the Voronoi cells
 let hoverInterval;
 let hueValue = 0;
@@ -212,24 +214,38 @@ function draw() {
   fill(0);
   noStroke();
   for (let i = 0; i < cellCenters.length; i++) {
-    push();
-    if (hoveredCell === i) {
-      // Use the last background color for text
-      // fill(lastColors[i]);
-      
-      // Add underline
-      const labelWidth = textWidth(cellLabels[i]);
-      const x = cellCenters[i].x;
-      const y = cellCenters[i].y;
-      
-      // Draw the text
-      text(cellLabels[i], x, y);
-      
-    } else {
-      fill(0);
-      text(cellLabels[i], cellCenters[i].x, cellCenters[i].y);
+    // Remove the text drawing code and create HTML links instead
+    const label = cellLabels[i];
+    const href = cellHrefs[label];
+    
+    // Create or update link element
+    let linkId = `voronoi-link-${i}`;
+    let linkElement = document.getElementById(linkId);
+    
+    if (!linkElement) {
+      linkElement = document.createElement('a');
+      linkElement.id = linkId;
+      linkElement.rel = 'history';
+      linkElement.style.position = 'absolute';
+      linkElement.style.textDecoration = 'none';
+      linkElement.style.color = 'black';
+      linkElement.style.fontSize = '22px';
+      document.body.appendChild(linkElement);
     }
-    pop();
+    
+    // Update link properties
+    linkElement.href = href;
+    linkElement.textContent = label;
+    linkElement.style.left = `${cellCenters[i].x}px`;
+    linkElement.style.top = `${cellCenters[i].y}px`;
+    linkElement.style.transform = 'translate(-50%, -50%)'; // Center the link
+    
+    // Update styles for hovered state
+    if (hoveredCell === i) {
+      linkElement.style.color = 'yellow'; // or any hover state styling you prefer
+    } else {
+      linkElement.style.color = 'black';
+    }
   }
 
   // Draw original points
