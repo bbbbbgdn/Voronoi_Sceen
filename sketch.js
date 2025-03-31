@@ -356,13 +356,12 @@ function mousePressed() {
     
     // Navigate using Cargo's internal page switching
     if (href) {
-      return;
-      // Create a temporary link with rel="history"
-      const tempLink = document.createElement('a');
-      tempLink.href = href;
-      tempLink.rel = 'history';
-      // Simulate click on this temporary link
-      tempLink.click();
+      // Find the existing link element for this cell
+      const linkId = `voronoi-link-${cell.index - 1}`;
+      const linkElement = document.getElementById(linkId);
+      if (linkElement) {
+        linkElement.click();
+      }
       return false; // Prevent default behavior
     }
     
