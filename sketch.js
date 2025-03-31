@@ -2,9 +2,9 @@
 // Cell href links
 const cellHrefs = {
   "about": "#about",
-  "work": "work",
-  "play": "play",
-  "contact": "contact-form",
+  "work": "#work",
+  "play": "#play",
+  "contact": "#contact-form",
   "tools": "#tools",
   "photos": "#photos"
 };
