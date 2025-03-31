@@ -290,10 +290,17 @@ function mousePressed() {
   // Get the cell that was clicked
   if (mouseX >= 0 && mouseX < width && mouseY >= 0 && mouseY < height) {
     const cell = voronoi.getCell(mouseX, mouseY);
-    console.log(`Clicked on ${cellLabels[cell.index - 1]}`);
+    const label = cellLabels[cell.index - 1];
+    const href = cellHrefs[label];
+    
+    // Navigate to the href
+    if (href) {
+      window.location.href = href;
+    }
+    
+    // Existing color change code
     randomColor(cell);
     
-    // Start interval for continuous color changes while mouse is held
     mouseHoldInterval = setInterval(() => {
       if (mouseX >= 0 && mouseX < width && mouseY >= 0 && mouseY < height) {
         const currentCell = voronoi.getCell(mouseX, mouseY);
@@ -302,7 +309,7 @@ function mousePressed() {
     }, 50);
   }
   
-  return false; // Prevent default behavior
+  return false;
 }
 
 function mouseReleased() {
