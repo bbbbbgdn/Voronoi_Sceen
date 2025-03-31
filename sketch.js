@@ -66,6 +66,7 @@ let hueValue = 0;
 function setup() {
   // Make canvas fill the entire window
   createCanvas(windowWidth, windowHeight);
+  cursor(pointer);
 
   // Initialize cellPixels array
   for (let i = 0; i < numPoints; i++) {
