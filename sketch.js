@@ -5,7 +5,7 @@ const cellHrefs = {
   "work": "work",
   "play": "play",
   "contact": "contact-form",
-  "tools": "tools",
+  "tools": "/tools",
   "photos": "photos"
 };
 
@@ -66,7 +66,7 @@ let hueValue = 0;
 function setup() {
   // Make canvas fill the entire window
   createCanvas(windowWidth, windowHeight);
-  cursor(pointer);
+  cursor(HAND);
 
   // Initialize cellPixels array
   for (let i = 0; i < numPoints; i++) {
