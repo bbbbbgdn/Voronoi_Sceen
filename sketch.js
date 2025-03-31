@@ -355,9 +355,15 @@ function mousePressed() {
     const label = cellLabels[cell.index - 1];
     const href = cellHrefs[label];
     
-    // Navigate to the href
+    // Navigate using Cargo's internal page switching
     if (href) {
-      window.location.href = href;
+      // Create a temporary link with rel="history"
+      const tempLink = document.createElement('a');
+      tempLink.href = href;
+      tempLink.rel = 'history';
+      // Simulate click on this temporary link
+      tempLink.click();
+      return false; // Prevent default behavior
     }
     
     // Existing color change code
