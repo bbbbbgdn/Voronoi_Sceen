@@ -239,42 +239,53 @@ function draw() {
 }
 
 function updateHoveredCell() {
-  // Check mouse position to determine which cell is being hovered
+  // First check if mouse is actually over the canvas
+  if (mouseX === 0 && mouseY === 0 && !mouseIsPressed && 
+      (document.mouseX === undefined || document.mouseY === undefined || 
+       document.mouseX < 0 || document.mouseX > width || 
+       document.mouseY < 0 || document.mouseY > height)) {
+    // Mouse is likely outside canvas, and we're seeing the default 0,0 position
+    if (hoverInterval) {
+      clearInterval(hoverInterval);
+      hoverInterval = null;
+    }
+    if (hoveredCell !== null) {
+      lastColors[hoveredCell] = colors[hoveredCell];
+    }
+    hoveredCell = null;
+    return;
+  }
+
+  // Regular hover check
   if (mouseX >= 0 && mouseX < width && mouseY >= 0 && mouseY < height) {
     const cell = voronoi.getCell(mouseX, mouseY);
     const newHoveredCell = cell.index - 1;
     
-    // If hovered cell changed
+    // Rest of the existing hover logic
     if (hoveredCell !== newHoveredCell) {
-      // Clear existing interval if any
       if (hoverInterval) {
         clearInterval(hoverInterval);
       }
       
-      // Store the current color before changing it
       if (hoveredCell !== null) {
         lastColors[hoveredCell] = colors[hoveredCell];
       }
       
       hoveredCell = newHoveredCell;
       if (hoveredCell !== null) {
-        // Initial color change
         colors[hoveredCell] = color(random(100, 255), random(100, 255), random(100, 255), 200);
         
-        // Set up interval for continuous color changes
         hoverInterval = setInterval(() => {
           colors[hoveredCell] = color(random(100, 255), random(100, 255), random(100, 255), 200);
         }, 1200);
       }
     }
   } else {
-    // Clear interval when mouse leaves
     if (hoverInterval) {
       clearInterval(hoverInterval);
       hoverInterval = null;
     }
     
-    // Store the current color before clearing hover
     if (hoveredCell !== null) {
       lastColors[hoveredCell] = colors[hoveredCell];
     }
