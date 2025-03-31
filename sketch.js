@@ -2,8 +2,8 @@
 // Cell href links
 const cellHrefs = {
   "about": "#about",
-  "work": "#work",
-  "play": "#play",
+  "work": "work",
+  "play": "play",
   "contact": "contact-form",
   "tools": "#tools",
   "photos": "#photos"
@@ -52,12 +52,15 @@ class Voronoi {
 let voronoi;
 let points = [];
 let colors = [];
+let originalColors = []; // Store original colors
+let lastColors = []; // Store last background colors before hover
 let cellCenters = [];
 let hoveredCell = null;
 let cellPixels = []; // Store which pixels belong to which cell
 const numPoints = 6; // Updated to 6 for all labels
 const cellLabels = ["about", "work", "play", "contact", "tools", "photos"];
-const resolution = 10; // Resolution for rendering the Voronoi cells
+const resolution = 20; // Resolution for rendering the Voronoi cells
+let hoverInterval;
 
 function setup() {
   // Make canvas fill the entire window
@@ -81,9 +84,10 @@ function setup() {
 
   // Generate random colors for cells
   for (let i = 0; i < numPoints; i++) {
-    colors.push(
-      color(random(100, 255), random(100, 255), random(100, 255), 200)
-    );
+    const newColor = color(random(100, 255), random(100, 255), random(100, 255), 1);
+    colors.push(newColor);
+    originalColors.push(newColor); // Store the original color
+    lastColors.push(newColor); // Initialize last colors
   }
 
   // Find cell centers for text placement
@@ -128,7 +132,7 @@ function draw() {
   // Draw cell boundaries
   stroke(0);
   strokeWeight(2);
-  strokeCap(SQUARE);
+  // strokeCap(SQUARE);
 
   for (let x = 0; x < width; x += resolution) {
     for (let y = 0; y < height; y += resolution) {
@@ -146,7 +150,7 @@ function draw() {
       if (y + resolution < height) {
         const bottomCell = voronoi.getCell(x, y + resolution);
         if (bottomCell.index !== cell.index) {
-          line(x, y + resolution, x + resolution, y + resolution);
+          // line(x, y + resolution, x + resolution, y + resolution);
         }
       }
     }
@@ -201,20 +205,29 @@ function draw() {
   }
 
   // Draw cell labels
-  textSize(24);
+  textSize(22);
   textAlign(CENTER, CENTER);
-  textStyle(BOLD);
   fill(0);
   noStroke();
   for (let i = 0; i < cellCenters.length; i++) {
-    // Add stroke only when cell is hovered
-    // if (hoveredCell === i) {
-    //   stroke(255, 255, 0);
-    //   strokeWeight(2);
-    // } else {
-    //   noStroke();
-    // }
-    text(cellLabels[i], cellCenters[i].x, cellCenters[i].y);
+    push();
+    if (hoveredCell === i) {
+      // Use the last background color for text
+      // fill(lastColors[i]);
+      
+      // Add underline
+      const labelWidth = textWidth(cellLabels[i]);
+      const x = cellCenters[i].x;
+      const y = cellCenters[i].y;
+      
+      // Draw the text
+      text(cellLabels[i], x, y);
+      
+    } else {
+      fill(0);
+      text(cellLabels[i], cellCenters[i].x, cellCenters[i].y);
+    }
+    pop();
   }
 
   // Draw original points
@@ -231,14 +244,40 @@ function updateHoveredCell() {
     const cell = voronoi.getCell(mouseX, mouseY);
     const newHoveredCell = cell.index - 1;
     
-    // If hovered cell changed, update its color
+    // If hovered cell changed
     if (hoveredCell !== newHoveredCell) {
+      // Clear existing interval if any
+      if (hoverInterval) {
+        clearInterval(hoverInterval);
+      }
+      
+      // Store the current color before changing it
+      if (hoveredCell !== null) {
+        lastColors[hoveredCell] = colors[hoveredCell];
+      }
+      
       hoveredCell = newHoveredCell;
       if (hoveredCell !== null) {
+        // Initial color change
         colors[hoveredCell] = color(random(100, 255), random(100, 255), random(100, 255), 200);
+        
+        // Set up interval for continuous color changes
+        hoverInterval = setInterval(() => {
+          colors[hoveredCell] = color(random(100, 255), random(100, 255), random(100, 255), 200);
+        }, 1200);
       }
     }
   } else {
+    // Clear interval when mouse leaves
+    if (hoverInterval) {
+      clearInterval(hoverInterval);
+      hoverInterval = null;
+    }
+    
+    // Store the current color before clearing hover
+    if (hoveredCell !== null) {
+      lastColors[hoveredCell] = colors[hoveredCell];
+    }
     hoveredCell = null;
   }
 }
@@ -268,17 +307,29 @@ function findCellCenters() {
   }
 
   // Calculate average position (centroid) for each cell
+  cellCenters = []; // Clear existing centers
   for (let i = 0; i < numPoints; i++) {
     if (cellPoints[i].count > 0) {
+      // Calculate the raw center
+      const rawX = cellPoints[i].sumX / cellPoints[i].count;
+      const rawY = cellPoints[i].sumY / cellPoints[i].count;
+      
+      // Snap to grid by rounding to nearest resolution step
+      const snappedX = Math.round(rawX / resolution) * resolution;
+      const snappedY = Math.round(rawY / resolution) * resolution;
+      
       cellCenters.push({
-        x: cellPoints[i].sumX / cellPoints[i].count,
-        y: cellPoints[i].sumY / cellPoints[i].count,
+        x: snappedX,
+        y: snappedY
       });
     } else {
-      // Fallback to the original point if no samples
+      // Fallback to the original point if no samples, but still snap to grid
+      const snappedX = Math.round(points[i].x / resolution) * resolution;
+      const snappedY = Math.round(points[i].y / resolution) * resolution;
+      
       cellCenters.push({
-        x: points[i].x,
-        y: points[i].y,
+        x: snappedX,
+        y: snappedY
       });
     }
   }
