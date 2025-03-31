@@ -61,6 +61,7 @@ const numPoints = 6; // Updated to 6 for all labels
 const cellLabels = ["about", "work", "play", "contact", "tools", "photos"];
 const resolution = 20; // Resolution for rendering the Voronoi cells
 let hoverInterval;
+let hueValue = 0;
 
 function setup() {
   // Make canvas fill the entire window
@@ -244,14 +245,6 @@ function updateHoveredCell() {
       (document.mouseX === undefined || document.mouseY === undefined || 
        document.mouseX < 0 || document.mouseX > width || 
        document.mouseY < 0 || document.mouseY > height)) {
-    // Mouse is likely outside canvas, and we're seeing the default 0,0 position
-    if (hoverInterval) {
-      clearInterval(hoverInterval);
-      hoverInterval = null;
-    }
-    if (hoveredCell !== null) {
-      lastColors[hoveredCell] = colors[hoveredCell];
-    }
     hoveredCell = null;
     return;
   }
@@ -261,34 +254,23 @@ function updateHoveredCell() {
     const cell = voronoi.getCell(mouseX, mouseY);
     const newHoveredCell = cell.index - 1;
     
-    // Rest of the existing hover logic
     if (hoveredCell !== newHoveredCell) {
-      if (hoverInterval) {
-        clearInterval(hoverInterval);
-      }
-      
       if (hoveredCell !== null) {
         lastColors[hoveredCell] = colors[hoveredCell];
       }
-      
       hoveredCell = newHoveredCell;
-      if (hoveredCell !== null) {
-        colors[hoveredCell] = color(random(100, 255), random(100, 255), random(100, 255), 200);
-        
-        hoverInterval = setInterval(() => {
-          colors[hoveredCell] = color(random(100, 255), random(100, 255), random(100, 255), 200);
-        }, 1200);
-      }
-    }
-  } else {
-    if (hoverInterval) {
-      clearInterval(hoverInterval);
-      hoverInterval = null;
+      // Add random offset to hue when changing cells
+      hueValue = (hueValue + random(0, 360)) % 360;
     }
     
+    // Smoothly cycle hue for hovered cell
     if (hoveredCell !== null) {
-      lastColors[hoveredCell] = colors[hoveredCell];
+      colorMode(HSB);
+      hueValue = (hueValue + 0.1) % 360;
+      colors[hoveredCell] = color(hueValue, 70, 60);
+      colorMode(RGB);
     }
+  } else {
     hoveredCell = null;
   }
 }
