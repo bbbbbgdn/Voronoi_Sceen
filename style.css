@@ -23,7 +23,7 @@ canvas {
 
 
 .voronoi-link {
-  pointer-events: none;
+  pointer-events: auto;
   user-select: none;
   z-index: 1;
 }

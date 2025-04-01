@@ -364,7 +364,14 @@ class VoronoiManager {
     }
   }
 
-  handleClick(x, y) {
+  handleClick(x, y, event) {
+    // Check if click target is canvas or voronoi-link
+    const validTargets = ['canvas', 'voronoi-link'];
+    if (!event.target.classList.contains('voronoi-link') && 
+        !event.target.matches('canvas')) {
+      return false;
+    }
+
     const cell = this.voronoi.getCell(x, y);
     if (cell) {
       const voronoiCell = this.cells[cell.index - 1];
@@ -415,9 +422,9 @@ function draw() {
   voronoiManager.draw();
 }
 
-function mousePressed() {
+function mousePressed(event) {
   if (mouseX >= 0 && mouseX < width && mouseY >= 0 && mouseY < height) {
-    return voronoiManager.handleClick(mouseX, mouseY);
+    return voronoiManager.handleClick(mouseX, mouseY, event);
   }
   return false;
 }
@@ -444,13 +451,22 @@ function randomColor(cell){
 }
 
 // Touch events support
-function touchStarted() {
-  // Update the hovered cell for touch devices
+function touchStarted(event) {
   if (touches.length > 0) {
     const touch = touches[0];
     if (touch.x >= 0 && touch.x < width && touch.y >= 0 && touch.y < height) {
+      // Check if touch target is canvas or voronoi-link
+      const validTargets = ['canvas', 'voronoi-link'];
+      if (!event.target.classList.contains('voronoi-link') && 
+          !event.target.matches('canvas')) {
+        return false;
+      }
+
       const cell = voronoiManager.voronoi.getCell(touch.x, touch.y);
       voronoiManager.hoveredCell = cell.index - 1;
+      
+      // Handle the click/tap
+      voronoiManager.handleClick(touch.x, touch.y, event);
     }
   }
   return false; // Prevent default behavior
