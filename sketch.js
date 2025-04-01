@@ -77,7 +77,11 @@ class VoronoiCell {
     this.linkElement.textContent = this.label;
     this.linkElement.className = 'voronoi-link';
     this.updateLinkStyle();
-    document.body.appendChild(this.linkElement);
+    // Change parent element to mainpage-container
+    const container = document.getElementById('mainpage-container');
+    if (container) {
+      container.appendChild(this.linkElement);
+    }
   }
 
   updateLinkStyle() {
@@ -381,18 +385,29 @@ class VoronoiManager {
 let voronoiManager;
 
 function setup() {
-  // Make canvas fill the entire window
-  createCanvas(windowWidth, windowHeight);
-  cursor(HAND);
-
-  // Initialize Voronoi manager
-  voronoiManager = new VoronoiManager(cellHrefs);
+  const container = document.getElementById('mainpage-container');
+  if (container) {
+    // Create canvas inside the container
+    const canvas = createCanvas(container.offsetWidth, container.offsetHeight);
+    canvas.parent(container);
+    
+    // Set container style to handle canvas positioning
+    container.style.position = 'relative';
+    
+    cursor(HAND);
+    
+    // Initialize Voronoi manager
+    voronoiManager = new VoronoiManager(cellHrefs);
+  }
 }
 
-// Resize canvas when window is resized
+// Update windowResized to use container dimensions
 function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-  voronoiManager.updateCellCenters();
+  const container = document.getElementById('mainpage-container');
+  if (container) {
+    resizeCanvas(container.offsetWidth, container.offsetHeight);
+    voronoiManager.updateCellCenters();
+  }
 }
 
 function draw() {
